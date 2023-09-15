@@ -10,8 +10,12 @@ import "../App.css";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { updatePassword } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
-import {MdOutlineArrowBack} from 'react-icons/md'
+import { MdOutlineArrowBack } from "react-icons/md";
 import { Link } from "react-router-dom";
+import Image from "../Components/Image";
+import {AiFillDelete} from "react-icons/ai"
+
+
 const Profile = () => {
   const [togglePassword, setTogglePassword] = useState(false);
   const [toggleEdit, setToggleEdit] = useState(false);
@@ -20,7 +24,7 @@ const Profile = () => {
   const [password, setPassword] = useState(data.password);
   const [user, setUser] = useState(data.user);
   const fileInputRef = useRef(null);
-
+  const [userData,setUserData] = useState()
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -45,7 +49,22 @@ const Profile = () => {
   const handleFileButtonClick = () => {
     fileInputRef.current.click();
   };
+const fetchData = async () => {
+    try {
+      const docRef = doc(db, "user", data.email);
+      const docsnap = await getDoc(docRef);
+      if (docsnap.exists()) {
+        const allData = docsnap.data()
+        setUserData(allData.posts)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
+useEffect(() => {
+  fetchData()
+}, [])
   useEffect(() => {
     const uploadImage = async () => {
       const name = new Date().getTime() + file.name;
@@ -66,28 +85,33 @@ const Profile = () => {
               break;
           }
         },
-        (error) => {console.log(error)},
+        (error) => {
+          console.log(error);
+        },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          const docRef = doc(db, "user", data.email);
+            const docRef = doc(db, "user", data.email);
             updateDoc(docRef, {
               email: data.email,
               password: data.password,
               user: data.user,
               profilePic: downloadURL,
             });
-          
           });
         }
       );
     };
     file && uploadImage();
   }, [file]);
+
   return (
-    <div className="flex">
-      <Link to='/'>
-    <span className='flex items-center justify-between  text-3xl   cursor-pointer text-gray-500 px-5 mt-5'><MdOutlineArrowBack className='text-gray-500'/>Back</span>
-    </Link>
+    <div className="">
+      <Link to="/">
+        <span className="flex items-center  text-3xl   cursor-pointer text-gray-500 px-5 mt-5">
+          <MdOutlineArrowBack className="text-gray-500" />
+          Back
+        </span>
+      </Link>
       <div className="p-10 w-full flex flex-col items-center">
         <h1 className="text-5xl font-extrabold text-gray-500">Profile</h1>
         <form
@@ -170,9 +194,26 @@ const Profile = () => {
           </button>
         </form>
         <div className="posts">
-          <h1 className="text-5xl font-extrabold text-gray-500">Posts</h1>
-          <div>
-
+          <h1 className="text-5xl font-extrabold text-gray-500 text-center mb-5">Posts</h1>
+          <div className="grid grid-cols-3 gap-3">
+                {userData && userData.map((post) => {
+                  return (
+                    <div class="card cursor-pointer">
+                    <img src={post.downloadURL} alt="Card " className="card-img" />
+                    <div className="card-content">
+                      
+                     <div className="download-button text-red-600">
+                      <AiFillDelete/>
+                     </div>
+                      <h2 className="card-title">{post.title}</h2>
+                      <h5 className="card-desc">{post.desc}</h5>
+                      <h3 className="card-user">By:- {post.user}</h3>
+                    </div>
+                  </div>
+                  );
+                  
+                }
+                )}
           </div>
         </div>
       </div>

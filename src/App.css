@@ -117,7 +117,7 @@
     top: 10px;
     right: 10px;
     background-color: white;
-    color: black;
+    color: red;
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -130,7 +130,7 @@
 }
 
 .download-button:hover {
-    background-color: #0056b3;
+    background-color: #d1d3d4;
 }
 .card-user{
   color: white;
