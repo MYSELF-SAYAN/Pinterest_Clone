@@ -32,6 +32,14 @@ useEffect(() => {
     });
   }
 }, [liked])
+const handleDownload = () => {
+  const a = document.createElement("a");
+  a.href = url; // Set the URL of the file to be downloaded
+  a.download = "image.jpg"; // You can set the desired filename here
+  a.target = "_blank"; // Open the download link in a new tab
+  a.rel = "noopener noreferrer"; // Add noreferrer for security reasons
+  a.click();
+};
   return (
     <div class="card cursor-pointer">
       <img src={url} alt="Card " className="card-img" />
@@ -55,7 +63,7 @@ useEffect(() => {
           )}
           <p className="text-lg ">{likeCount}</p>
         </div>
-        <div className="download-button">
+        <div className="download-button" onClick={handleDownload}>
           <FiDownload />
         </div>
         <h2 className="card-title">{title}</h2>
